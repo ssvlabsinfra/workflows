@@ -1,0 +1,55 @@
+name: "Go Reusable Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: The Go version to use. Examples - '1.22' / '1.22.5' / 'ˆ1.22.5'
+        required: false
+        type: string
+        default: "1.22.x"
+
+jobs:
+  go-lint:
+    name: "Runs Go Linter steps"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+  go-build:
+    name: "Runs Go Build steps"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Build
+        run: make build
+
+  go-test:
+    name: "Runs Go Test steps"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Test
+        run: make test
